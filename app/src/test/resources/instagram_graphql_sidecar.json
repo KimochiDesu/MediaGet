@@ -1,0 +1,27 @@
+{
+  "_comment": "Synthetic fixture in the shape of the public graphql/query response (data.xdt_shortcode_media).",
+  "data": {
+    "xdt_shortcode_media": {
+      "__typename": "XDTGraphSidecar",
+      "owner": {"username": "someone"},
+      "edge_media_to_caption": {"edges": [{"node": {"text": "Hello"}}]},
+      "edge_sidecar_to_children": {"edges": [
+        {"node": {
+          "is_video": false,
+          "display_url": "https://cdn.example/a_1080.jpg",
+          "dimensions": {"width": 1080, "height": 1080},
+          "display_resources": [
+            {"src": "https://cdn.example/a_640.jpg", "config_width": 640, "config_height": 640},
+            {"src": "https://cdn.example/a_1080.jpg", "config_width": 1080, "config_height": 1080}
+          ]
+        }},
+        {"node": {
+          "is_video": true,
+          "display_url": "https://cdn.example/b_cover.jpg",
+          "video_url": "https://cdn.example/b.mp4",
+          "dimensions": {"width": 720, "height": 1280}
+        }}
+      ]}
+    }
+  }
+}

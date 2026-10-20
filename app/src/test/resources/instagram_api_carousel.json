@@ -1,0 +1,28 @@
+{
+  "_comment": "Synthetic fixture in the shape of www.instagram.com/api/v1/media/{id}/info/ (Instagram blocked live capture from the dev machine).",
+  "items": [
+    {
+      "media_type": 8,
+      "user": {"username": "someone"},
+      "caption": {"text": "Two things"},
+      "carousel_media": [
+        {
+          "media_type": 1,
+          "image_versions2": {"candidates": [
+            {"url": "https://cdn.example/img_320.jpg", "width": 320, "height": 400},
+            {"url": "https://cdn.example/img_1080.jpg", "width": 1080, "height": 1350}
+          ]}
+        },
+        {
+          "media_type": 2,
+          "image_versions2": {"candidates": [{"url": "https://cdn.example/cover.jpg", "width": 640, "height": 1136}]},
+          "video_versions": [
+            {"url": "https://cdn.example/v_480.mp4", "width": 480, "height": 852},
+            {"url": "https://cdn.example/v_720.mp4", "width": 720, "height": 1280},
+            {"url": "https://cdn.example/v_720.mp4", "width": 720, "height": 1280}
+          ]
+        }
+      ]
+    }
+  ]
+}
