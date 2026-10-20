@@ -1,4 +1,4 @@
-# MediaGet (MediaGrab)
+# MediaGrab
 
 Android app that saves photos and videos from X/Twitter, Instagram, Facebook and YouTube.
 Paste a link, or use **Share → MediaGrab** from any of those apps.
@@ -7,7 +7,7 @@ long-press to share, delete or retry).
 
 ## Download
 
-Get the latest APK from the [Releases page](https://github.com/KimochiDesu/MediaGet/releases/latest).
+Get the latest APK from the [Releases page](https://github.com/KimochiDesu/MediaGrab/releases/latest).
 
 1. Download `MediaGrab-v1.0.0.apk` on your phone (Android 10 or newer).
 2. Open it and allow "Install unknown apps" for your browser or file manager when asked.
