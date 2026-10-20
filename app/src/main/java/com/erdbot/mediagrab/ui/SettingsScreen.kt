@@ -38,7 +38,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.erdbot.mediagrab.BuildConfig
 import com.erdbot.mediagrab.ui.theme.Mg
+import com.erdbot.mediagrab.update.Updater
 import com.erdbot.mediagrab.ui.theme.ThemeId
 import com.erdbot.mediagrab.ui.theme.themeFor
 
@@ -48,6 +50,7 @@ fun SettingsScreen(viewModel: MainViewModel, state: UiState, onBack: () -> Unit,
     val t = Mg
     val current by viewModel.theme.collectAsStateWithLifecycle()
     val suggest by viewModel.suggestClipboard.collectAsStateWithLifecycle()
+    val checkUpdates by viewModel.checkUpdates.collectAsStateWithLifecycle()
 
     Column(
         Modifier.fillMaxSize().statusBarsPadding().verticalScroll(rememberScrollState()).navigationBarsPadding()
@@ -111,6 +114,30 @@ fun SettingsScreen(viewModel: MainViewModel, state: UiState, onBack: () -> Unit,
                 }
                 HorizontalDivider(color = t.outline.copy(alpha = 0.4f))
                 SettingRow("Saved to", "Downloads/MediaGrab", onClick = null) {}
+            }
+        }
+
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            MgLabel("Updates")
+            MgCard(padding = 14.dp) {
+                SettingRow("Check on launch", "Look for new releases on GitHub when the app opens", onClick = { viewModel.setCheckUpdates(!checkUpdates) }) {
+                    Switch(
+                        checked = checkUpdates,
+                        onCheckedChange = viewModel::setCheckUpdates,
+                        colors = SwitchDefaults.colors(
+                            checkedTrackColor = t.accent, checkedThumbColor = t.onAccent,
+                            uncheckedTrackColor = t.surfaceAlt, uncheckedThumbColor = t.muted, uncheckedBorderColor = t.outline,
+                        ),
+                    )
+                }
+                HorizontalDivider(color = t.outline.copy(alpha = 0.4f))
+                SettingRow("Version ${BuildConfig.VERSION_NAME}", state.updateStatus ?: "github.com/${Updater.REPO}", onClick = null) {
+                    if (state.update != null) {
+                        MgButton("Update", viewModel::installUpdate, height = 44.dp, enabled = state.updateProgress == null)
+                    } else {
+                        MgButton("Check", { viewModel.checkForUpdate() }, kind = ButtonKind.GHOST, height = 44.dp)
+                    }
+                }
             }
         }
         Spacer(Modifier.height(8.dp))

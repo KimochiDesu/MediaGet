@@ -1,6 +1,7 @@
 package com.erdbot.mediagrab.extract
 
 import com.erdbot.mediagrab.extract.facebook.FacebookExtractor
+import com.erdbot.mediagrab.extract.tiktok.TikTokExtractor
 import com.erdbot.mediagrab.extract.twitter.TwitterExtractor
 import com.erdbot.mediagrab.extract.youtube.YouTubeExtractor
 import kotlinx.coroutines.test.runTest
@@ -80,6 +81,13 @@ class LiveExtractorTest {
         assertFetchable(hd.audioUrl!!, "audio/mp4")
         assertTrue(variants.any { it.mimeType == "audio/mp4" })
         assertTrue(variants.any { it.audioUrl == null && it.mimeType == "video/mp4" }) // 360p ready-made
+    }
+
+    @Test
+    fun tiktokVideoEndToEnd() = runTest {
+        val post = TikTokExtractor().extract("https://www.tiktok.com/@scout2015/video/6718335390845095173")
+        assertEquals("scout2015", post.author)
+        assertFetchable(post.items.single().best.url, "video/mp4")
     }
 
     @Test

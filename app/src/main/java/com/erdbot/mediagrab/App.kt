@@ -11,9 +11,11 @@ import com.erdbot.mediagrab.extract.Extractors
 import com.erdbot.mediagrab.extract.Http
 import com.erdbot.mediagrab.extract.facebook.FacebookExtractor
 import com.erdbot.mediagrab.extract.instagram.InstagramExtractor
+import com.erdbot.mediagrab.extract.tiktok.TikTokExtractor
 import com.erdbot.mediagrab.extract.twitter.TwitterExtractor
 import com.erdbot.mediagrab.extract.youtube.YouTubeExtractor
 import com.erdbot.mediagrab.ui.WebSessions
+import com.erdbot.mediagrab.update.Updater
 
 /** Holds the app-wide singletons. */
 class App : Application(), ImageLoaderFactory {
@@ -27,6 +29,7 @@ class App : Application(), ImageLoaderFactory {
                 InstagramExtractor(WebSessions.instagram, http),
                 FacebookExtractor(WebSessions.facebook, http),
                 YouTubeExtractor(WebSessions.youtube, http),
+                TikTokExtractor(http),
             ),
         )
     }
@@ -36,6 +39,8 @@ class App : Application(), ImageLoaderFactory {
     val settings by lazy { Settings(this) }
 
     val engine by lazy { DownloadEngine(this, http.client) }
+
+    val updater by lazy { Updater(this, http.client) }
 
     override fun onCreate() {
         super.onCreate()

@@ -74,6 +74,7 @@ import com.erdbot.mediagrab.extract.MediaType
 import com.erdbot.mediagrab.extract.Variant
 import com.erdbot.mediagrab.ui.theme.Mg
 import com.erdbot.mediagrab.ui.theme.ThemeId
+import com.erdbot.mediagrab.update.AppUpdate
 
 /** Root UI: Grab and Media tabs, plus the Settings screen over them. */
 @Composable
@@ -192,6 +193,9 @@ private fun GrabTab(
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         item { Header(loggedIn = state.instagramLoggedIn || state.facebookLoggedIn || state.xLoggedIn || state.youtubeLoggedIn, onOpenSettings) }
+        state.update?.let { update ->
+            item(key = "update") { UpdateCard(update, state.updateProgress, viewModel::installUpdate, viewModel::dismissUpdate) }
+        }
         item {
             Column(Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 if (t.id == ThemeId.NIGHT_SHIFT) MgLabel("● Ready", color = t.accent)
@@ -323,7 +327,7 @@ private fun LinkCard(viewModel: MainViewModel, state: UiState) {
             enabled = !state.loading,
         )
         Text(
-            "X · INSTAGRAM · FACEBOOK · YOUTUBE",
+            "X · INSTAGRAM · FACEBOOK · YOUTUBE · TIKTOK",
             Modifier.fillMaxWidth(),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             style = TextStyle(fontFamily = t.mono, fontSize = 10.sp, letterSpacing = 1.sp, color = t.muted),
@@ -354,6 +358,27 @@ private fun PrivateCard(site: String, message: String, onLogin: (String) -> Unit
         MgBody(message, size = 14.sp, color = t.muted)
         MgButton("Log in to $siteName", { onLogin(site) }, Modifier.fillMaxWidth())
         MgLabel("Your password goes to ${if (site == LoginActivity.SITE_YOUTUBE) "Google" else siteName}, not us")
+    }
+}
+
+/** "Version x is out" with release notes; installs from the GitHub release. */
+@Composable
+private fun UpdateCard(update: AppUpdate, progress: Float?, onUpdate: () -> Unit, onLater: () -> Unit) {
+    val t = Mg
+    MgCard {
+        MgLabel("Update available", color = t.accent)
+        MgDisplay("MediaGrab ${update.version}", 24.sp)
+        val notes = update.notes.lineSequence().map { it.trim().removePrefix("#").trim() }.filter { it.isNotEmpty() }.joinToString("\n")
+        if (notes.isNotEmpty()) MgBody(notes, size = 13.sp, color = t.muted, maxLines = 5)
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            val label = when {
+                progress == null -> "Update"
+                progress < 0f -> "Downloading…"
+                else -> "Downloading ${(progress * 100).toInt()}%"
+            }
+            MgButton(label, onUpdate, Modifier.weight(1f), enabled = progress == null)
+            if (progress == null) MgButton("Later", onLater, kind = ButtonKind.GHOST)
+        }
     }
 }
 

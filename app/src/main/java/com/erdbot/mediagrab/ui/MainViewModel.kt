@@ -14,6 +14,7 @@ import com.erdbot.mediagrab.extract.MediaPost
 import com.erdbot.mediagrab.extract.Platform
 import com.erdbot.mediagrab.extract.Variant
 import com.erdbot.mediagrab.ui.theme.ThemeId
+import com.erdbot.mediagrab.update.AppUpdate
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,6 +37,12 @@ data class UiState(
     val message: String? = null,
     /** A supported link found on the clipboard, offered as "Copied a link — use it?". */
     val clipSuggestion: String? = null,
+    /** A newer release on GitHub, offered until installed or dismissed. */
+    val update: AppUpdate? = null,
+    /** Download progress of [update] (0..1, -1 unknown), null when not downloading. */
+    val updateProgress: Float? = null,
+    /** Result of a manual "Check for updates" in Settings. */
+    val updateStatus: String? = null,
 )
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
@@ -48,12 +55,62 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     val downloads: StateFlow<List<DownloadRecord>> = this.app.downloads.records
     val theme: StateFlow<ThemeId> = this.app.settings.theme
     val suggestClipboard: StateFlow<Boolean> = this.app.settings.suggestClipboard
+    val checkUpdates: StateFlow<Boolean> = this.app.settings.checkUpdates
 
     /** Links already offered or used, so the same copied link isn't suggested twice. */
     private val offeredLinks = mutableSetOf<String>()
 
     init {
         refreshLogins()
+        if (this.app.settings.checkUpdates.value) checkForUpdate(manual = false)
+    }
+
+    fun setCheckUpdates(on: Boolean) = app.settings.setCheckUpdates(on)
+
+    /** Asks GitHub for a newer release; a manual check also reports "up to date" and errors. */
+    fun checkForUpdate(manual: Boolean = true) {
+        if (manual) _state.update { it.copy(updateStatus = "Checking…") }
+        viewModelScope.launch {
+            try {
+                val update = app.updater.check()
+                _state.update {
+                    it.copy(
+                        update = update ?: it.update,
+                        updateStatus = if (!manual) it.updateStatus else if (update != null) "Version ${update.version} is available" else "You're on the latest version",
+                    )
+                }
+            } catch (e: ExtractionException) {
+                if (manual) _state.update { it.copy(updateStatus = e.message) }
+            } catch (e: org.json.JSONException) {
+                if (manual) _state.update { it.copy(updateStatus = "GitHub sent an unexpected answer.") }
+            }
+        }
+    }
+
+    fun dismissUpdate() = _state.update { it.copy(update = null) }
+
+    /** Downloads the update and opens Android's install screen. */
+    fun installUpdate() {
+        val update = _state.value.update ?: return
+        if (_state.value.updateProgress != null) return
+        if (!app.updater.canInstall()) {
+            app.updater.openInstallPermissionSettings()
+            _state.update { it.copy(message = "Allow MediaGrab to install apps, then tap Update again") }
+            return
+        }
+        _state.update { it.copy(updateProgress = 0f) }
+        viewModelScope.launch {
+            try {
+                val apk = app.updater.download(update) { p -> _state.update { it.copy(updateProgress = p) } }
+                app.updater.install(apk)
+                _state.update { it.copy(updateProgress = null) }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // PackageInstaller reports bad APKs and session errors as IOException/SecurityException.
+                _state.update { it.copy(updateProgress = null, message = e.message ?: "The update failed.") }
+            }
+        }
     }
 
     fun setTheme(id: ThemeId) = app.settings.setTheme(id)
@@ -91,7 +148,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun fetch() {
         val url = Links.firstUrl(_state.value.input)
         if (url == null) {
-            _state.update { it.copy(error = "Paste an X, Instagram, Facebook or YouTube link.") }
+            _state.update { it.copy(error = "Paste an X, Instagram, Facebook, YouTube or TikTok link.") }
             return
         }
         job?.cancel()

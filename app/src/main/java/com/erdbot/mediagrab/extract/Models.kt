@@ -1,6 +1,6 @@
 package com.erdbot.mediagrab.extract
 
-enum class Platform { TWITTER, INSTAGRAM, FACEBOOK, YOUTUBE }
+enum class Platform { TWITTER, INSTAGRAM, FACEBOOK, YOUTUBE, TIKTOK }
 
 enum class MediaType { IMAGE, VIDEO, GIF, AUDIO }
 
@@ -82,7 +82,7 @@ class Extractors(private val all: List<Extractor>) {
 
     suspend fun extract(url: String): MediaPost {
         val extractor = find(url)
-            ?: throw ExtractionException("That link isn't an X/Twitter, Instagram, Facebook or YouTube post.")
+            ?: throw ExtractionException("That link isn't an X/Twitter, Instagram, Facebook, YouTube or TikTok post.")
         return extractor.extract(url)
     }
 }

@@ -1,6 +1,6 @@
 # MediaGrab
 
-Android app that saves photos and videos from X/Twitter, Instagram, Facebook and YouTube.
+Android app that saves photos and videos from X/Twitter, Instagram, Facebook, YouTube and TikTok.
 Paste a link, or use **Share → MediaGrab** from any of those apps.
 Files are saved to `Downloads/MediaGrab` and listed in the **Media** tab (tap to open,
 long-press to share, delete or retry).
@@ -9,11 +9,15 @@ long-press to share, delete or retry).
 
 Get the latest APK from the [Releases page](https://github.com/KimochiDesu/MediaGrab/releases/latest).
 
-1. Download `MediaGrab-v1.0.0.apk` on your phone (Android 10 or newer).
+1. Download the `MediaGrab-vX.Y.Z.apk` file on your phone (Android 10 or newer).
 2. Open it and allow "Install unknown apps" for your browser or file manager when asked.
 3. Open **MediaGrab**, paste a link, or share a post to it from another app.
 
 The app isn't on Google Play because Play doesn't allow YouTube downloaders.
+
+After that the app updates itself: when it opens it checks this repo's latest release and offers
+the new version (Settings → Updates to turn this off or check by hand). The first time, Android
+asks you to allow MediaGrab to install apps.
 
 ## How it works
 
@@ -25,6 +29,8 @@ The app isn't on Google Play because Play doesn't allow YouTube downloaders.
 | Facebook video/reel | 1. `plugins/video.php` embed (`hd_src`/`sd_src`)<br>2. the video page anonymously (reels)<br>3. the video page with your session | Only for non-public videos |
 | Facebook photo/post | the photo or post page (anonymous, then with your session): every `viewer_image`, else `og:image` | Only for non-public posts |
 | YouTube video/Short | [NewPipeExtractor](https://github.com/TeamNewPipe/NewPipeExtractor) | No (age-restricted videos fail) |
+| TikTok video | the embed player `/embed/v2/{id}` (its MP4 links work without cookies) | No; private videos can't be downloaded |
+| TikTok photo slideshow | the mobile post page's `api-data` script (`imagePost.images`) | No |
 
 YouTube only serves ready-made video+audio files up to 360p. Higher qualities download the
 H.264 video and AAC audio tracks separately and merge them on the phone with `MediaMuxer`.
@@ -52,12 +58,21 @@ The sites change their web clients. When something breaks, check first:
 
 - `TwitterExtractor.TWEET_QUERY_ID` and `GRAPHQL_FEATURES`
 - `InstagramExtractor.POST_DOC_IDS`
+- `TikTokParser` (the embed page's `__FRONTITY_CONNECT_STATE__` and the mobile page's `api-data`)
 - the NewPipeExtractor version in `app/build.gradle.kts` (YouTube breaks most often; update it)
 
 ## Adding another site
 
 Implement `extract.Extractor` (`canHandle` + `extract` returning a `MediaPost`) and add it to the
 list in `App.extractors`. Downloads, history and UI are shared.
+
+## Releasing an update
+
+1. Bump `versionCode` and `versionName` in `app/build.gradle.kts`.
+2. `./gradlew assembleRelease` on the machine that built the previous release. Android only accepts
+   an update signed with the same key, and it is currently that machine's debug key.
+3. Create a GitHub release tagged `vX.Y.Z` and attach the APK. Installed apps pick it up the next
+   time they open.
 
 ## Build and test
 

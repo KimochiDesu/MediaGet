@@ -133,6 +133,7 @@ fun MgTheme.platformColor(platform: com.erdbot.mediagrab.extract.Platform): Colo
     com.erdbot.mediagrab.extract.Platform.INSTAGRAM -> if (dark) Color(0xFFF0B6FF) else Color(0xFFB0127A)
     com.erdbot.mediagrab.extract.Platform.FACEBOOK -> if (dark) Color(0xFF9DC1FF) else Color(0xFF1F55C7)
     com.erdbot.mediagrab.extract.Platform.YOUTUBE -> if (dark) Color(0xFFFF9C8A) else Color(0xFFC0281A)
+    com.erdbot.mediagrab.extract.Platform.TIKTOK -> if (dark) Color(0xFF7FE8E2) else Color(0xFF00807A)
 }
 
 val LocalMg = staticCompositionLocalOf { themeFor(ThemeId.NIGHT_SHIFT) }

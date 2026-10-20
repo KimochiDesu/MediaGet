@@ -17,6 +17,9 @@ class Settings(context: Context) {
     private val _suggestClipboard = MutableStateFlow(prefs.getBoolean(KEY_CLIPBOARD, true))
     val suggestClipboard: StateFlow<Boolean> = _suggestClipboard
 
+    private val _checkUpdates = MutableStateFlow(prefs.getBoolean(KEY_CHECK_UPDATES, true))
+    val checkUpdates: StateFlow<Boolean> = _checkUpdates
+
     fun setTheme(id: ThemeId) {
         _theme.value = id
         prefs.edit().putString(KEY_THEME, id.name).apply()
@@ -27,8 +30,14 @@ class Settings(context: Context) {
         prefs.edit().putBoolean(KEY_CLIPBOARD, on).apply()
     }
 
+    fun setCheckUpdates(on: Boolean) {
+        _checkUpdates.value = on
+        prefs.edit().putBoolean(KEY_CHECK_UPDATES, on).apply()
+    }
+
     private companion object {
         const val KEY_THEME = "theme"
         const val KEY_CLIPBOARD = "suggest_clipboard"
+        const val KEY_CHECK_UPDATES = "check_updates"
     }
 }

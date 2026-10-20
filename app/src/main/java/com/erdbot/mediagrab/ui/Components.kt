@@ -162,6 +162,7 @@ fun platformShort(p: Platform) = when (p) {
     Platform.INSTAGRAM -> "IG"
     Platform.FACEBOOK -> "FB"
     Platform.YOUTUBE -> "YT"
+    Platform.TIKTOK -> "TT"
 }
 
 fun platformName(p: Platform) = when (p) {
@@ -169,6 +170,7 @@ fun platformName(p: Platform) = when (p) {
     Platform.INSTAGRAM -> "Instagram"
     Platform.FACEBOOK -> "Facebook"
     Platform.YOUTUBE -> "YouTube"
+    Platform.TIKTOK -> "TikTok"
 }
 
 /** "YT 1080p"-style tag on a dark pill, readable over any thumbnail. */
